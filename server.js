@@ -452,11 +452,11 @@ app.post('/v1/chat/completions', async (req, res) => {
     let primaryModel = MODEL_MAPPING[model];
     if (!primaryModel) {
       console.warn(`[PROXY] Unknown model alias "${model}", falling back to default: ${DEFAULT_MODEL}`);
-      primaryModel = DEFAULT_MODEL;
+            return res.status(400).json({ error: { message: `Unknown model alias "${model}"`, type: 'invalid_request_error', code: 400 } });
     }
 
     // De-dupe: avoids retrying the same model twice if it's also in FALLBACK_MODELS.
-    const modelChain = [...new Set([primaryModel, ...FALLBACK_MODELS])];
+    const modelChain = [primaryModel];
 
     // Forward all client fields except model (replaced per-attempt) and
     // reasoning_effort (translated per-model by getReasoningPayload).
